@@ -40,7 +40,8 @@ class Equivalence:
         uni = Select(self.driver.find_element(By.ID, "university_id"))
         options_uni = [option.text for option in uni.options]
 
-        options_uni = options_uni[0:2]
+        words_to_check = ["health", "Health", "safety", "Safety"]
+
         # Initialize an empty dictionary to store the results
         result_dict = {}
         
@@ -51,9 +52,12 @@ class Equivalence:
             
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "degree_title")))
             degree = Select(self.driver.find_element(By.ID, "degree_title"))
-            time.sleep(5)
+            time.sleep(3)
             # Get all options in dropdown B for the selected option in A
-            options_b = [option.text for option in degree.options]
+            options_b = []
+            for option in degree.options:
+                if(any(word in option.text for word in words_to_check)):
+                    options_b.add(option.text)
             time.sleep(3)
             # Store the options in a dictionary with dropdown A option as key
             result_dict[option_a] = options_b
