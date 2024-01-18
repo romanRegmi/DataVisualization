@@ -24,7 +24,8 @@ class Equivalence:
             element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "button.close[data-dismiss='modal'][aria-label='Close']")))
         except Exception as e:
             print("The element cannot be found")
-        element.click()
+        if(element):
+            element.click()
 
     def login(self):
         self.driver.find_element(By.ID, "email").send_keys(const.EMAIL)
@@ -44,9 +45,10 @@ class Equivalence:
 
         # Initialize an empty dictionary to store the results
         result_dict = {}
-        
+        counter = 0
         # Loop through each option in dropdown A
         for option_a in options_uni:
+            counter = counter + 1
             # Select an option in dropdown A
             uni.select_by_visible_text(option_a)
             
@@ -55,24 +57,19 @@ class Equivalence:
             time.sleep(3)
             # Get all options in dropdown B for the selected option in A
             options_b = []
-            for option in degree.options:
-                if(any(word in option.text for word in words_to_check)):
-                    options_b.add(option.text)
+            try:
+                for option in degree.options:
+                    if(option.text):
+                        options_b.append(option.text)
+            except Exception as e:
+                print(f"Error: Error occured {e}")
+
             time.sleep(3)
             # Store the options in a dictionary with dropdown A option as key
             result_dict[option_a] = options_b
+            print(counter)
 
-        print(result_dict)
         with open('result_data.json', 'w') as json_file:
             json.dump(result_dict, json_file)
         
         print("Data saved as 'result_data.json'")
-
-
-
-
-
-
-
-
-    
