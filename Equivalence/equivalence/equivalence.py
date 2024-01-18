@@ -17,6 +17,8 @@ class Equivalence:
             self.driver = webdriver.Chrome()
         except Exception as e:
             self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        
+        self.words_to_check = ["health", "safety"]
 
     def land_first_page(self):
         self.driver.get(const.BASE_URL)
@@ -37,11 +39,19 @@ class Equivalence:
         apply_button = self.driver.find_element(By.XPATH, "//a[@class='btn btn-success']")
         apply_button.click()
 
+    def contains_keyword(self, sentence):
+        lower_sentence = sentence.lower()
+
+        for word in self.words_to_check:
+            if word.lower() in lower_sentence:
+                return True
+
+        return False
+
     def selectUni(self):
         uni = Select(self.driver.find_element(By.ID, "university_id"))
         options_uni = [option.text for option in uni.options]
 
-        words_to_check = ["health", "Health", "safety", "Safety"]
 
         # Initialize an empty dictionary to store the results
         result_dict = {}
@@ -59,15 +69,18 @@ class Equivalence:
             options_b = []
             try:
                 for option in degree.options:
-                    if(option.text):
+                    if(self.contains_keyword(option.text)):
                         options_b.append(option.text)
             except Exception as e:
                 print(f"Error: Error occured {e}")
 
             time.sleep(3)
             # Store the options in a dictionary with dropdown A option as key
-            result_dict[option_a] = options_b
+            if(options_b):
+                result_dict[option_a] = options_b
             print(counter)
+
+        
 
         with open('result_data.json', 'w') as json_file:
             json.dump(result_dict, json_file)
